@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jackpot Crypto Finder - MA Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .filters {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-group input, .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .coin-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .jackpot-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .coin-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .coin-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            font-weight: 700;
+        }
+
+        .coin-title h3 {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .coin-symbol {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .coin-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .potential {
+            color: #10b981;
+        }
+
+        .price {
+            color: #667eea;
+        }
+
+        .coin-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.3em;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎰 Jackpot Crypto Finder</h1>
+            <p class="subtitle">Trouvez la crypto à moins de 100€ qui peut valoir 100k€ dans 5 ans</p>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Prix max:</label>
+                <input type="number" id="maxPrice" value="100" min="1" step="1">
+                <label>€</label>
+
+                <label>Potentiel min:</label>
+                <input type="number" id="minPotential" value="1000" min="100" step="100">
+                <label>x</label>
+
+                <button class="btn" onclick="searchCoins()">🔍 Rechercher</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Analyse des cryptomonnaies en cours...</p>
+        </div>
+
+        <div id="results" class="results-grid"></div>
+    </div>
+
+    <script>
+        // Données simulées de cryptomonnaies avec un potentiel élevé
+        const cryptoDatabase = [
+            {
+                name: "Kaspa",
+                symbol: "KAS",
+                price: 0.15,
+                marketCap: 3500000000,
+                potential: 2000,
+                category: "Layer 1",
+                technology: "BlockDAG",
+                score: 9.2,
+                risk: "Moyen",
+                reasons: ["Technologie BlockDAG révolutionnaire", "Scalabilité extrême", "Équipe solide", "Adoption croissante"]
+            },
+            {
+                name: "Radix",
+                symbol: "XRD",
+                price: 0.04,
+                marketCap: 520000000,
+                potential: 2500,
+                category: "DeFi",
+                technology: "Cerberus Consensus",
+                score: 9.0,
+                risk: "Moyen-Élevé",
+                reasons: ["Solution DeFi native", "Sharding infini", "Partenariats solides", "Écosystème en expansion"]
+            },
+            {
+                name: "Flux",
+                symbol: "FLUX",
+                price: 0.65,
+                marketCap: 250000000,
+                potential: 1800,
+                category: "Cloud Computing",
+                technology: "Web3 Infrastructure",
+                score: 8.8,
+                risk: "Moyen",
+                reasons: ["Infrastructure cloud décentralisée", "Alternative à AWS/Azure", "Déploiement simple", "Demande croissante"]
+            },
+            {
+                name: "Aleph Zero",
+                symbol: "AZERO",
+                price: 0.45,
+                marketCap: 320000000,
+                potential: 2200,
+                category: "Privacy",
+                technology: "Zero-Knowledge",
+                score: 9.1,
+                risk: "Moyen",
+                reasons: ["Privacy by design", "Financement européen", "Vitesse exceptionnelle", "Écosystème DeFi"]
+            },
+            {
+                name: "Persistence",
+                symbol: "XPRT",
+                price: 0.18,
+                marketCap: 45000000,
+                potential: 3000,
+                category: "Liquid Staking",
+                technology: "Cosmos SDK",
+                score: 8.5,
+                risk: "Élevé",
+                reasons: ["Leader liquid staking", "Interopérabilité Cosmos", "Rendements attractifs", "Petit marketcap"]
+            },
+            {
+                name: "Ergo",
+                symbol: "ERG",
+                price: 1.2,
+                marketCap: 40000000,
+                potential: 3500,
+                category: "Layer 1",
+                technology: "PoW + UTXO",
+                score: 8.7,
+                risk: "Élevé",
+                reasons: ["Fondateur de Cardano", "Recherche académique", "DeFi innovant", "Très sous-évalué"]
+            },
+            {
+                name: "Nervos Network",
+                symbol: "CKB",
+                price: 0.006,
+                marketCap: 280000000,
+                potential: 2800,
+                category: "Interoperability",
+                technology: "Multi-layer",
+                score: 8.6,
+                risk: "Moyen-Élevé",
+                reasons: ["Interopérabilité BTC", "Architecture unique", "Partenariats asiatiques", "Longue durabilité"]
+            },
+            {
+                name: "Constellation",
+                symbol: "DAG",
+                price: 0.05,
+                marketCap: 130000000,
+                potential: 2600,
+                category: "Data",
+                technology: "HGTP Protocol",
+                score: 8.4,
+                risk: "Élevé",
+                reasons: ["Données décentralisées", "Partenariat US Air Force", "Scalabilité infinie", "Marché B2B"]
+            },
+            {
+                name: "Multiverse",
+                symbol: "AI",
+                price: 0.08,
+                marketCap: 95000000,
+                potential: 3200,
+                category: "AI",
+                technology: "AI Integration",
+                score: 8.9,
+                risk: "Élevé",
+                reasons: ["IA + Blockchain", "Marché en explosion", "Équipe technique forte", "Innovations constantes"]
+            },
+            {
+                name: "Velas",
+                symbol: "VLX",
+                price: 0.012,
+                marketCap: 85000000,
+                potential: 2400,
+                category: "Layer 1",
+                technology: "AI-DPoS",
+                score: 8.3,
+                risk: "Élevé",
+                reasons: ["AI-powered consensus", "EVM compatible", "Vitesse élevée", "NFT ecosystem"]
+            }
+        ];
+
+        function searchCoins() {
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+            const minPotential = parseFloat(document.getElementById('minPotential').value);
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+
+            setTimeout(() => {
+                const filtered = cryptoDatabase
+                    .filter(coin => coin.price <= maxPrice && coin.potential >= minPotential)
+                    .sort((a, b) => b.score - a.score);
+
+                document.getElementById('loading').style.display = 'none';
+                displayResults(filtered);
+            }, 1500);
+        }
+
+        function displayResults(coins) {
+            const resultsDiv = document.getElementById('results');
+
+            if (coins.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">Aucune crypto trouvée avec ces critères. Essayez d\'ajuster les filtres.</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = coins.map(coin => `
+                <div class="coin-card">
+                    <div class="jackpot-badge">Jackpot Potentiel</div>
+                    <div class="coin-header">
+                        <div class="coin-icon">${coin.symbol.substring(0, 2)}</div>
+                        <div class="coin-title">
+                            <h3>${coin.name}</h3>
+                            <div class="coin-symbol">${coin.symbol}</div>
+                        </div>
+                    </div>
+
+                    <div class="coin-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Prix actuel</div>
+                            <div class="metric-value price">€${coin.price.toFixed(4)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Potentiel</div>
+                            <div class="metric-value potential">${coin.potential}x</div>
+                        </div>
+                    </div>
+
+                    <div class="coin-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Score</span>
+                            <span class="detail-value">${coin.score}/10</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Catégorie</span>
+                            <span class="detail-value">${coin.category}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Risque</span>
+                            <span class="detail-value">${coin.risk}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Market Cap</span>
+                            <span class="detail-value">€${(coin.marketCap / 1000000).toFixed(0)}M</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Valeur cible (5 ans)</span>
+                            <span class="detail-value potential">€${(coin.price * coin.potential).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #f0f0f0;">
+                        <div style="font-weight: 600; margin-bottom: 10px; color: #333;">Raisons du potentiel:</div>
+                        <ul style="padding-left: 20px; color: #666; font-size: 0.9em; line-height: 1.6;">
+                            ${coin.reasons.map(reason => `<li>${reason}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Recherche automatique au chargement
+        window.onload = () => {
+            searchCoins();
+        };
+    </script>
+</body>
+</html>
